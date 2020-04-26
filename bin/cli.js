@@ -11,14 +11,14 @@ const chalk = require('chalk');
 
     commander
         .command('init')
-        .action(async (dir, cmd) => {
+        .action(async ( cmd) => {
             await tasks.init();
         })
     commander
-        .command('install')
-        .option('-y, --recursive', 'Remove recursively')
-        .action((dir, cmd) => {
-            console.log('remove ' + dir + (cmd.recursive ? ' recursively' : ''))
+        .command('add <name>')
+        .option('-d, --id', 'use mod curseforge id')
+        .action(async (name, cmd) => {
+            await tasks.add(name,cmd.id);
         })
     commander.parse(process.argv);
 })()
