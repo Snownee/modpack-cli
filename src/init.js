@@ -1,4 +1,5 @@
 const chalk = require('chalk');
+const fs = require('fs');
 var inquirer = require('inquirer')
 exports.default = async () => {
     const root = process.cwd();
@@ -13,9 +14,15 @@ exports.default = async () => {
         },
         {
             type: 'input',
-            name: 'version',
+            name: 'mcversion',
             message: chalk.red('Which is your minecraft version?'),
             default: "1.12.2"
+        },
+        {
+            type: 'input',
+            name: 'author',
+            message: chalk.red('Author?'),
+            default: "cool guy"
         },
         {
             type: 'list',
@@ -25,6 +32,15 @@ exports.default = async () => {
             choices:["forge","fabric"]
         }
     ])
-    console.log(ans)
-
+    ans.version = {
+        major: 0,
+        minor: 0,
+        patch: 0
+    }
+    fs.writeFile(`${root}/modpack.json`, JSON.stringify(ans, '\n', 2), e => {
+        if (e)
+            console.error(e)
+        else
+            console.log('Done!')
+    })
 }
