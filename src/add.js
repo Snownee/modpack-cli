@@ -8,14 +8,15 @@ const { DownloaderHelper } = require('node-downloader-helper');
 
 exports.default = async (name) => {
     const root = process.cwd();
-    const mods = path.join(process.cwd(),"mods");
-    const manifest = path.join(process.cwd(),"manifest.json");
+    const mods = path.join(root,"mods");
+    const manifest = path.join(root,"manifest.json");
     console.log(chalk.blue(`[Crane]: add mod ${name} in ${root}`));
     if (!fs.existsSync(manifest)){
         console.log(chalk.red(`[Crane]: could not found manifest.json in ${root}, please use ${chalk.blue('crane init')} first!`));
         process.exit(0);
     }
     let fest = JSON.parse(fs.readFileSync(manifest,{encoding:"utf-8"}));//Json parse失败
+    let cfg = JSON.parse(fs.readFileSync(path.join(root,"crane-project.json")))
     await makeDir(mods);//mods无法mkdir
     if (fest.minecraft===undefined || fest.minecraft.version === undefined){
         console.log(chalk.red(`[Crane]: manifest.json do not have minecraft version!`));
@@ -27,10 +28,13 @@ exports.default = async (name) => {
         mod = await curse.getMod(name);
     }
     else {
-        let mods_list = await curse.getMods({searchFilter: "cuisine"})
+        let mods_list = await curse.getMods({
+          searchFilter: name,
+          gameVersion: cfg.mcversion
+        })
         let que = [];
         for (let i of mods_list) {
-            que.push(`mod name:${i.name},author ${i.authors[0].name}`)
+            que.push(`\x1b[1m${i.name}\x1b[0m by ${i.authors[0].name}`)
         }
         let ans = await inquirer.prompt([
             {
