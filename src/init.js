@@ -1,5 +1,7 @@
 const chalk = require('chalk');
 const fs = require('fs');
+const path = require('path');
+const makeDir = require('make-dir');
 var inquirer = require('inquirer')
 exports.default = async () => {
     const root = process.cwd();
@@ -37,10 +39,13 @@ exports.default = async () => {
         minor: 0,
         patch: 0
     }
-    fs.writeFile(`${root}/modpack.json`, JSON.stringify(ans, '\n', 2), e => {
-        if (e)
-            console.error(e)
-        else
-            console.log('Done!')
-    })
+    fs.writeFileSync(path.join(root, 'crane-project.json'), JSON.stringify(ans, '\n', 2))
+    fs.writeFileSync(path.join(root, 'crane-mods.json'), JSON.stringify([], '\n', 2))
+    fs.writeFileSync(path.join(root, 'crane-includes.json'), JSON.stringify([
+      "mods",
+      "config",
+      "options.txt"
+    ], '\n', 2))
+    makeDir.sync(path.join(root, 'mods'))
+    console.log('Done!')
 }
