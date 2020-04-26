@@ -16,9 +16,8 @@ const chalk = require('chalk');
         })
     commander
         .command('add <name>')
-        .option('-d, --id', 'use mod curseforge id')
         .action(async (name, cmd) => {
-            await tasks.add(name,cmd.id);
+            await tasks.add(name);
         })
     commander.parse(process.argv);
 })()

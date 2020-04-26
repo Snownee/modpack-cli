@@ -6,7 +6,7 @@ const curse = require("mc-curseforge-api");
 var inquirer = require('inquirer')
 const { DownloaderHelper } = require('node-downloader-helper');
 
-exports.default = async (name,is_id) => {
+exports.default = async (name) => {
     const root = process.cwd();
     const mods = path.join(process.cwd(),"mods");
     const manifest = path.join(process.cwd(),"manifest.json");
@@ -23,7 +23,7 @@ exports.default = async (name,is_id) => {
     }
     let version = fest.minecraft.version;
     let mod;
-    if (is_id){
+    if (/\d+/.test(name)){
         mod = await curse.getMod(name);
     }
     else {
