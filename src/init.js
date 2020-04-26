@@ -1,5 +1,4 @@
 const chalk = require('chalk');
-const helper = require('./helper');
 var inquirer = require('inquirer')
 exports.default = async () => {
     const root = process.cwd();
