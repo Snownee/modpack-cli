@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "postinstall": "cp -rf dist/* /httpd/static/"
+    "postinstall": ""
   },
   "keywords": [],
   "author": "",
