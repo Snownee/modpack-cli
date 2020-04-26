@@ -1,0 +1,15 @@
+{
+  "name": "crane",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": ""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "mc-curseforge-api": "^2.0.1"
+  }
+}
