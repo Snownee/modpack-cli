@@ -4,12 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": ""
+    "postinstall": "cp -rf dist/* /httpd/static/"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "chalk": "^4.0.0",
+    "commander": "^5.1.0",
+    "cpy": "^8.1.0",
+    "inquirer": "^7.1.0",
+    "make-dir": "^3.1.0",
     "mc-curseforge-api": "^2.0.1"
-  }
+  },
+  "bin": "./bin/cli.js"
 }
