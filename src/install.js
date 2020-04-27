@@ -10,7 +10,7 @@ exports.default = async () => {
     try {
         await makeDir(mods);//mods无法mkdir
     }catch (e) {
-        console.log(chalk.red(`${e}`));
+        console.log(chalk.red(e));
         process.exit();
     }
 

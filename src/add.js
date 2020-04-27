@@ -19,7 +19,7 @@ exports.default = async (name) => {
 
     }
     catch (e) {
-        console.log(chalk.red(`${e}`));
+        console.log(chalk.red(e));
         process.exit();
     }
     let mod;
