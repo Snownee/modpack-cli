@@ -7,7 +7,9 @@ const inquirer = require('inquirer')
 const fetch = require('node-fetch');
 var adm_zip = require('adm-zip');
 
-exports.default = async () => {
+exports.default = async (includes) => {
+    if (!includes) includes = 'default'
+    includes += '.json'
     const root = process.cwd();
     const crane_temp = path.join(root,".crane","temp");
     const overrides = path.join(root,".crane","temp","overrides");
@@ -17,7 +19,7 @@ exports.default = async () => {
     let includes_cfg ;
     try {
         mods_cfg = JSON.parse(fs.readFileSync(path.join(root,"crane-mods.json")));
-        includes_cfg = JSON.parse(fs.readFileSync(path.join(root,"crane-includes.json")));
+        includes_cfg = JSON.parse(fs.readFileSync(path.join(root, "crane_includes", includes)));
         cfg = JSON.parse(fs.readFileSync(path.join(root,"crane-project.json")));
         await makeDir(crane_temp);
     }
@@ -62,12 +64,12 @@ exports.default = async () => {
         overrides:"overrides"
     }
     fs.writeFileSync(`${crane_temp}/manifest.json`,JSON.stringify(manifest, '\n', 2));
-    await cpy(includes_cfg, overrides,{parents:true});
+    await cpy(includes_cfg.files, overrides, { parents:true });
     let zip = new adm_zip();
 
     zip.addLocalFolder(crane_temp);
 
-    zip.writeZip(`${root}/${cfg.name}-${cfg.version.major}.${cfg.version.minor}.${cfg.version.patch}.zip`);
+    zip.writeZip(path.join(root, 'build', `${cfg.name}-${cfg.version.major}.${cfg.version.minor}.${cfg.version.patch}.zip`));
 
 
 }

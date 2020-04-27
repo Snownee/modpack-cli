@@ -39,13 +39,18 @@ exports.default = async () => {
         minor: 0,
         patch: 0
     }
+    makeDir.sync(path.join(root, 'mods'))
+    makeDir.sync(path.join(root, 'build'))
+    makeDir.sync(path.join(root, 'crane_includes'))
     fs.writeFileSync(path.join(root, 'crane-project.json'), JSON.stringify(ans, '\n', 2))
     fs.writeFileSync(path.join(root, 'crane-mods.json'), JSON.stringify([], '\n', 2))
-    fs.writeFileSync(path.join(root, 'crane-includes.json'), JSON.stringify([
-      "mods",
-      "config",
-      "options.txt"
-    ], '\n', 2))
-    makeDir.sync(path.join(root, 'mods'))
+    fs.writeFileSync(path.join(root, 'crane_includes', 'default.json'), JSON.stringify(
+    {
+        files: [
+            "mods",
+            "config",
+            "options.txt"
+        ]
+    }, '\n', 2))
     console.log('Done!')
 }

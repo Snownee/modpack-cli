@@ -107,7 +107,8 @@ dist
 .vs/
 .vscode/
 mods/
-crane-includes.json
+build/
+crane_includes/
 crane-mods.json
 crane-project.json
 .crane
