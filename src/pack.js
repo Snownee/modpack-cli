@@ -44,15 +44,15 @@ exports.default = async (includes) => {
         version = ans.modloder_version.split(' at ')[0];
     }
     else {
-        console.log(chalk.red("do not support modloder version find!"))
+        console.log(chalk.red("Unsupported modloader found!"))
         version = "0.0.0";
     }
     let manifest = {
-        minecraft:{
-            version:cfg.mcversion,
-            modLoaders:{
-                id:`${cfg.modloader}-${version}`,
-                primary:true
+        minecraft: {
+            version: cfg.mcversion,
+            modLoaders: {
+                id: `${cfg.modloader}-${version}`,
+                primary: true
             }
         },
         manifestType: "minecraftModpack",
@@ -60,8 +60,10 @@ exports.default = async (includes) => {
         name: cfg.name,
         version: `${cfg.version.major}.${cfg.version.minor}.${cfg.version.patch}`,
         author: cfg.author,
-        files:mods_cfg.map(i=>{return {projectID:i.addon_id,fileID:i.file_id,required:true}}),
-        overrides:"overrides"
+        overrides: "overrides"
+    }
+    if (!includes_cfg.files.includes('mods')) {
+        manifest.files = mods_cfg.map(i=>{return {projectID:i.addon_id,fileID:i.file_id,required:true}})
     }
     fs.writeFileSync(`${crane_temp}/manifest.json`,JSON.stringify(manifest, '\n', 2));
     await cpy(includes_cfg.files, overrides, { parents:true });

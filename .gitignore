@@ -106,6 +106,8 @@ dist
 .idea/
 .vs/
 .vscode/
+
+# Crane files
 mods/
 build/
 crane_includes/
