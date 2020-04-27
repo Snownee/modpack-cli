@@ -69,12 +69,13 @@ exports.default = async (name) => {
             choices: strategies
         }
     ])
-    mod.strategy = ans.strategy
     logger.success(`Mod ${mod.name} added!`);
     mods_cfg.push({
         addon_id: mod.id,
         slug: mod.slug,
-        name: mod.name
+        name: mod.name,
+        strategy: ans.strategy,
+        date: new Date(2000, 0, 0)
     });
     fs.writeFileSync(path.join(root, 'modpack-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
     /*
