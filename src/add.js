@@ -59,6 +59,25 @@ exports.default = async (name) => {
         logger.failure(`Already exist this mod!`);
         process.exit();
     }
+    let strategies = [ "beta", "release", "alpha", "none" ]
+    let ans = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'strategy',
+            message: chalk.red('Choose updating strategy:'),
+            default: 0,
+            choices: strategies
+        }
+    ])
+    mod.strategy = ans.strategy
+    logger.success(`Mod ${mod.name} added!`);
+    mods_cfg.push({
+        addon_id: mod.id,
+        slug: mod.slug,
+        name: mod.name
+    });
+    fs.writeFileSync(path.join(root, 'crane-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
+    /*
     let mod_all_files = (await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/${mod.id}/files`)).json())
     mod_all_files = mod_all_files.sort((i,j)=>(new Date(i.fileDate).getTime() > new Date(j.fileDate).getTime()?-1:1))
     let mod_file = [];
@@ -113,4 +132,5 @@ exports.default = async (name) => {
         }
     })
     await dl.start();
+    */
 }
