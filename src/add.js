@@ -14,12 +14,15 @@ exports.default = async (name) => {
     let cfg ;
     try {
         mods_cfg = JSON.parse(fs.readFileSync(path.join(root,"crane-mods.json")));
+    } catch (e) {
+        mods_cfg = []
+    }
+    try {
         cfg = JSON.parse(fs.readFileSync(path.join(root,"crane-project.json")));
-        await makeDir(mods);
-
+        makeDir.sync(mods);
     }
     catch (e) {
-        console.log(chalk.red(e));
+        console.error(chalk.red(e));
         process.exit();
     }
     let mod;
