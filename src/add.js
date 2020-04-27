@@ -78,8 +78,15 @@ exports.default = async (name) => {
     const dl = new DownloaderHelper(file.downloadUrl, mods,{override:true});
     dl.on('end', () => {
         console.log(chalk.green(`[Crane]: mod ${mod.name} install succeed!`));
-        mods_cfg.push({addon_id:mod.id,file_id:file.id,name:mod.name,
-            file_name:file.displayName,dl_url:file.downloadUrl,dependencies:file.dependencies});
+        mods_cfg.push({
+            addon_id: mod.id,
+            slug: mod.slug,
+            file_id: file.id,
+            name: mod.name,
+            file_name: file.displayName,
+            dl_url: file.downloadUrl,
+            dependencies: file.dependencies
+        });
         fs.writeFileSync(path.join(root, 'crane-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
     })
     await dl.start();
