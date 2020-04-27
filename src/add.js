@@ -2,39 +2,31 @@ const chalk = require('chalk');
 const path = require('path');
 const makeDir = require('make-dir');
 const fs = require('fs');
-const curse = require("mc-curseforge-api");
-var inquirer = require('inquirer')
+const inquirer = require('inquirer')
+const fetch = require('node-fetch');
 const { DownloaderHelper } = require('node-downloader-helper');
 
 exports.default = async (name) => {
     const root = process.cwd();
-    const mods = path.join(root,"mods");
-    const manifest = path.join(root,"manifest.json");
     console.log(chalk.blue(`[Crane]: add mod ${name} in ${root}`));
-    if (!fs.existsSync(manifest)){
-        console.log(chalk.red(`[Crane]: could not found manifest.json in ${root}, please use ${chalk.blue('crane init')} first!`));
-        process.exit(0);
-    }
-    let fest = JSON.parse(fs.readFileSync(manifest,{encoding:"utf-8"}));//Json parse失败
-    let cfg = JSON.parse(fs.readFileSync(path.join(root,"crane-project.json")))
+    const mods = path.join(root,"mods");
+    let mods_cfg = JSON.parse(fs.readFileSync(path.join(root,"crane-mods.json")))
+    let cfg = JSON.parse(fs.readFileSync(path.join(root,"crane-project.json")))//Json parse失败
     await makeDir(mods);//mods无法mkdir
-    if (fest.minecraft===undefined || fest.minecraft.version === undefined){
-        console.log(chalk.red(`[Crane]: manifest.json do not have minecraft version!`));
-        process.exit(0);
-    }
-    let version = fest.minecraft.version;
     let mod;
     if (/\d+/.test(name)){
-        mod = await curse.getMod(name);
+        let mod =await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/${name}`)).json()
+        console.log(mod)
     }
     else {
-        let mods_list = await curse.getMods({
-          searchFilter: name,
-          gameVersion: cfg.mcversion
-        })
+        mods_list = await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/search?sectionId=6&gameId=432&gameVersion=${cfg.mcversion}&searchFilter=${name}`)).json()
+        if (mods_list.length === 0){
+            console.log(chalk.red(`[Crane]: do not found any mod!`));
+            process.exit();
+        }
         let que = [];
         for (let i of mods_list) {
-            que.push(`\x1b[1m${i.name}\x1b[0m by ${i.authors[0].name}`)
+            que.push(`${chalk.blueBright(i.name)} ${chalk.black("by")} ${i.authors[0].name}`)
         }
         let ans = await inquirer.prompt([
             {
@@ -48,17 +40,20 @@ exports.default = async (name) => {
         let index = que.findIndex((i) => i === ans.mod);
         mod = mods_list[index];
     }
-    let mods_list = [];
+    if (mods_cfg.filter(i=>i.addon_id===mod.id).length > 0){
+        console.log(chalk.red(`[Crane]: already exist this mod!`));
+        process.exit();
+    }
+    let mod_file = [];
     let mod_file_infos = [];
     for (let i of mod.latestFiles){
-        console.log(i)
-        let is_ok = i.minecraft_versions.filter((j)=>j===version);
-        if (is_ok){
-            mods_list.push(i);
-            mod_file_infos.push(`name: ${i.displayName} date: ${i.fileDate}`)
+        let is_ok = i.gameVersion.filter((j)=>j===cfg.mcversion);
+        if (is_ok.length > 0){
+            mod_file.push(i);
+            mod_file_infos.push(`${chalk.blueBright(i.displayName)} ${chalk.black("at")} ${i.fileDate}`)
         }
     }
-    ans = await inquirer.prompt([
+    let ans = await inquirer.prompt([
         {
             type: 'list',
             name: 'mod',
@@ -67,9 +62,13 @@ exports.default = async (name) => {
             choices:mod_file_infos
         }
     ])
-    index = mods_list.findIndex((i)=>i===ans.mod);
-    let file = mod_files[index];
-    const dl = new DownloaderHelper(file.downloadUrl, mods);
-    dl.on('end', () => console.log(chalk.green(`[Crane]: mod ${mod.name} install succeed!`)))
+    let index = mod_file_infos.findIndex((i)=>i===ans.mod);
+    let file = mod_file[index];
+    const dl = new DownloaderHelper(file.downloadUrl, mods,{override:true});
+    dl.on('end', () => {
+        console.log(chalk.green(`[Crane]: mod ${mod.name} install succeed!`));
+        mods_cfg.push({addon_id:mod.id,file_id:file.id,file_name:file.displayName,dl_url:file.downloadUrl,dependencies:file.dependencies});
+        fs.writeFileSync(path.join(root, 'crane-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
+    })
     await dl.start();
 }

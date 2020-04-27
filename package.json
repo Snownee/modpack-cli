@@ -15,8 +15,8 @@
     "cpy": "^8.1.0",
     "inquirer": "^7.1.0",
     "make-dir": "^3.1.0",
-    "mc-curseforge-api": "^2.0.1",
-    "node-downloader-helper": "^1.0.12"
+    "node-downloader-helper": "^1.0.12",
+    "node-fetch": "^2.6.0"
   },
   "bin": "./bin/cli.js"
 }

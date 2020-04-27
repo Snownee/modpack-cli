@@ -106,3 +106,7 @@ dist
 .idea/
 .vs/
 .vscode/
+mods/
+crane-includes.json
+crane-mods.json
+crane-project.json
