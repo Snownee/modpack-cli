@@ -11,13 +11,13 @@ exports.default = async () => {
         {
             type: 'input',
             name: 'name',
-            message: chalk.red('What is your modpack name?'),
+            message: chalk.red('Modpack name?'),
             default: "new modpack"
         },
         {
             type: 'input',
             name: 'mcversion',
-            message: chalk.red('Which is your minecraft version?'),
+            message: chalk.red('Minecraft version?'),
             default: "1.12.2"
         },
         {
@@ -29,7 +29,7 @@ exports.default = async () => {
         {
             type: 'list',
             name: 'modloader',
-            message: chalk.red('Which modloader do your like?'),
+            message: chalk.red('Modloader?'),
             default: 0,
             choices:["forge","fabric"]
         }

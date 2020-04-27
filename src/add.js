@@ -33,7 +33,7 @@ exports.default = async (name) => {
     else {
         mods_list = await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/search?sectionId=6&gameId=432&gameVersion=${cfg.mcversion}&searchFilter=${name}`)).json()
         if (mods_list.length === 0){
-            console.log(chalk.red(`[Crane]: do not found any mod!`));
+            console.log(chalk.red(`[Crane]: Cannot find any mod!`));
             process.exit();
         }
         let que = [];
@@ -80,7 +80,7 @@ exports.default = async (name) => {
     let file = mod_file[index];
     const dl = new DownloaderHelper(file.downloadUrl, mods,{override:true});
     dl.on('end', () => {
-        console.log(chalk.green(`[Crane]: mod ${mod.name} install succeed!`));
+        console.log(chalk.green(`[Crane]: mod ${mod.name} installed!`));
         mods_cfg.push({
             addon_id: mod.id,
             slug: mod.slug,
