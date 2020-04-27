@@ -107,10 +107,10 @@ dist
 .vs/
 .vscode/
 
-# Crane files
+# Modpack files
 mods/
 build/
-crane_includes/
-crane-mods.json
-crane-project.json
-.crane
+modpack_includes/
+modpack-mods.json
+modpack-project.json
+.modpack/

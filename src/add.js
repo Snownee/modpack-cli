@@ -15,12 +15,12 @@ exports.default = async (name) => {
     let mods_cfg;
     let cfg ;
     try {
-        mods_cfg = JSON.parse(fs.readFileSync(path.join(root,"crane-mods.json")));
+        mods_cfg = JSON.parse(fs.readFileSync(path.join(root,"modpack-mods.json")));
     } catch (e) {
         mods_cfg = []
     }
     try {
-        cfg = JSON.parse(fs.readFileSync(path.join(root,"crane-project.json")));
+        cfg = JSON.parse(fs.readFileSync(path.join(root,"modpack-project.json")));
         makeDir.sync(mods);
     }
     catch (e) {
@@ -76,7 +76,7 @@ exports.default = async (name) => {
         slug: mod.slug,
         name: mod.name
     });
-    fs.writeFileSync(path.join(root, 'crane-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
+    fs.writeFileSync(path.join(root, 'modpack-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
     /*
     let mod_all_files = (await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/${mod.id}/files`)).json())
     mod_all_files = mod_all_files.sort((i,j)=>(new Date(i.fileDate).getTime() > new Date(j.fileDate).getTime()?-1:1))
@@ -115,7 +115,7 @@ exports.default = async (name) => {
             dl_url: file.downloadUrl,
             dependencies: file.dependencies
         });
-        fs.writeFileSync(path.join(root, 'crane-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
+        fs.writeFileSync(path.join(root, 'modpack-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
     })
     dl.on('progress', stats => {
         const progress = stats.progress.toFixed(1);

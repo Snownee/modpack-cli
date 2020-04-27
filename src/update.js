@@ -15,7 +15,7 @@ exports.default = async () => {
     }
 
     logger.info(`Install modpack in ${root}`);
-    let mods_cfg = JSON.parse(fs.readFileSync(path.join(root,"crane-mods.json")))
+    let mods_cfg = JSON.parse(fs.readFileSync(path.join(root,"modpack-mods.json")))
     for (let i of mods_cfg){
         const dl = new DownloaderHelper(i.dl_url, mods,{override:true});
         dl.on('end', () => {

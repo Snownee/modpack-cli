@@ -1,13 +1,13 @@
 {
-  "name": "crane",
+  "name": "modpack",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "postinstall": ""
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["curseforge", "minecraft", "mod", "management"],
+  "author": "Snownee",
   "license": "MIT",
   "dependencies": {
     "adm-zip": "^0.4.14",

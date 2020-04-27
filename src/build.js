@@ -12,17 +12,17 @@ exports.default = async (includes) => {
     if (!includes) includes = 'default'
     includes += '.json'
     const root = process.cwd();
-    const crane_temp = path.join(root,".crane","temp");
-    const overrides = path.join(root,".crane","temp","overrides");
+    const modpack_temp = path.join(root,".modpack","temp");
+    const overrides = path.join(root,".modpack","temp","overrides");
     logger.info(`pack a modpack in ${root}`);
     let mods_cfg;
     let cfg ;
     let includes_cfg ;
     try {
-        mods_cfg = JSON.parse(fs.readFileSync(path.join(root,"crane-mods.json")));
-        includes_cfg = JSON.parse(fs.readFileSync(path.join(root, "crane_includes", includes)));
-        cfg = JSON.parse(fs.readFileSync(path.join(root,"crane-project.json")));
-        await makeDir(crane_temp);
+        mods_cfg = JSON.parse(fs.readFileSync(path.join(root,"modpack-mods.json")));
+        includes_cfg = JSON.parse(fs.readFileSync(path.join(root, "modpack_includes", includes)));
+        cfg = JSON.parse(fs.readFileSync(path.join(root,"modpack-project.json")));
+        await makeDir(modpack_temp);
     }
     catch (e) {
         logger.failure(e);
@@ -66,11 +66,11 @@ exports.default = async (includes) => {
     if (!includes_cfg.files.includes('mods')) {
         manifest.files = mods_cfg.map(i=>{return {projectID:i.addon_id,fileID:i.file_id,required:true}})
     }
-    fs.writeFileSync(`${crane_temp}/manifest.json`,JSON.stringify(manifest, '\n', 2));
+    fs.writeFileSync(`${modpack_temp}/manifest.json`,JSON.stringify(manifest, '\n', 2));
     await cpy(includes_cfg.files, overrides, { parents:true });
     let zip = new adm_zip();
 
-    zip.addLocalFolder(crane_temp);
+    zip.addLocalFolder(modpack_temp);
 
     zip.writeZip(path.join(root, 'build', `${cfg.name}-${cfg.version.major}.${cfg.version.minor}.${cfg.version.patch}.zip`));
 
