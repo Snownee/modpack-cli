@@ -3,9 +3,11 @@ const fs = require('fs');
 const path = require('path');
 const makeDir = require('make-dir');
 const inquirer = require('inquirer')
+const logger = require('./logger');
+
 exports.default = async () => {
     const root = process.cwd();
-    console.log(chalk.blue(`[Crane]: init a modpack in ${root}`));
+    logger.info(`Init a modpack in ${root}`);
     //https://juejin.im/entry/5937c73cac502e0068cf1171
     let ans = await inquirer.prompt([
         {
@@ -52,5 +54,5 @@ exports.default = async () => {
             "options.txt"
         ]
     }, '\n', 2))
-    console.log('Done!')
+    logger.success('Done!')
 }

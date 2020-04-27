@@ -5,10 +5,11 @@ const fs = require('fs');
 const inquirer = require('inquirer')
 const fetch = require('node-fetch');
 const { DownloaderHelper } = require('node-downloader-helper');
+const logger = require('./logger');
 
 exports.default = async (name) => {
     const root = process.cwd();
-    console.log(chalk.blue(`[Crane]: add mod ${name} in ${root}`));
+    logger.info(`Add mod ${name} in ${root}`);
     const mods = path.join(root,"mods");
     let mods_cfg;
     let cfg ;
@@ -34,12 +35,12 @@ exports.default = async (name) => {
     else {
         mods_list = await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/search?sectionId=6&gameId=432&gameVersion=${cfg.mcversion}&searchFilter=${name}`)).json()
         if (mods_list.length === 0){
-            console.log(chalk.red(`[Crane]: Cannot find any mod!`));
+            logger.failure(`Cannot find any mod!`);
             process.exit();
         }
         let que = [];
         for (let i of mods_list) {
-            que.push(`\x1b[1m${i.name}\x1b[0m by ${i.authors[0].name}`)
+            que.push(`${chalk.yellowBright(i.name)} by ${i.authors[0].name}`)
         }
         let ans = await inquirer.prompt([
             {
@@ -54,7 +55,7 @@ exports.default = async (name) => {
         mod = mods_list[index];
     }
     if (mods_cfg.filter(i=>i.addon_id===mod.id).length > 0){
-        console.log(chalk.red(`[Crane]: already exist this mod!`));
+        logger.failure(`Already exist this mod!`);
         process.exit();
     }
     let mod_all_files = (await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/${mod.id}/files`)).json())
@@ -81,7 +82,7 @@ exports.default = async (name) => {
     let file = mod_file[index];
     const dl = new DownloaderHelper(file.downloadUrl, mods,{override:true});
     dl.on('end', () => {
-        console.log(chalk.green(`[Crane]: mod ${mod.name} installed!`));
+        logger.success(`Mod ${mod.name} installed!`);
         mods_cfg.push({
             addon_id: mod.id,
             slug: mod.slug,

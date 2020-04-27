@@ -6,6 +6,7 @@ const cpy = require('cpy');
 const inquirer = require('inquirer')
 const fetch = require('node-fetch');
 var adm_zip = require('adm-zip');
+const logger = require('./logger');
 
 exports.default = async (includes) => {
     if (!includes) includes = 'default'
@@ -13,7 +14,7 @@ exports.default = async (includes) => {
     const root = process.cwd();
     const crane_temp = path.join(root,".crane","temp");
     const overrides = path.join(root,".crane","temp","overrides");
-    console.log(chalk.blue(`[Crane]: pack a modpack in ${root}`));
+    logger.info(`pack a modpack in ${root}`);
     let mods_cfg;
     let cfg ;
     let includes_cfg ;
@@ -24,7 +25,7 @@ exports.default = async (includes) => {
         await makeDir(crane_temp);
     }
     catch (e) {
-        console.log(chalk.red(e));
+        logger.failure(e);
         process.exit();
     }
     let version;
@@ -44,7 +45,7 @@ exports.default = async (includes) => {
         version = ans.modloder_version.split(' at ')[0];
     }
     else {
-        console.log(chalk.red("Unsupported modloader found!"))
+        logger.failure("Unsupported modloader found!")
         version = "0.0.0";
     }
     let manifest = {

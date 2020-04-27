@@ -1,25 +1,25 @@
-const chalk = require('chalk');
 const fs = require('fs');
 const path = require('path');
 const { DownloaderHelper } = require('node-downloader-helper');
 const makeDir = require('make-dir');
+const logger = require('./logger');
 
 exports.default = async () => {
     const root = process.cwd();
     const mods = path.join(root,"mods");
     try {
-        await makeDir(mods);//mods无法mkdir
-    }catch (e) {
-        console.log(chalk.red(e));
+        makeDir.sync(mods);//mods无法mkdir
+    } catch (e) {
+        logger.failure(e);
         process.exit();
     }
 
-    console.log(chalk.blue(`[Crane]: install a modpack in ${root}`));
+    logger.info(`install a modpack in ${root}`);
     let mods_cfg = JSON.parse(fs.readFileSync(path.join(root,"crane-mods.json")))
     for (let i of mods_cfg){
         const dl = new DownloaderHelper(i.dl_url, mods,{override:true});
         dl.on('end', () => {
-            console.log(chalk.green(`[Crane]: mod ${chalk.blue(i.name)} download succeed!`));
+            logger.success(`Mod ${chalk.blue(i.name)} download succeed!`);
         })
         dl.start();
     }
