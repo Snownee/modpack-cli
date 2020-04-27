@@ -20,14 +20,14 @@ const chalk = require('chalk');
             await tasks.add(name);
         })
     commander
-        .command('install')
+        .command('update')
         .action(async (cmd) => {
-            await tasks.install();
+            await tasks.update();
         })
     commander
-        .command('pack [includes]')
+        .command('build [includes]')
         .action(async (includes, cmd) => {
-            await tasks.pack(includes);
+            await tasks.build(includes);
         })
     commander.parse(process.argv);
 })()

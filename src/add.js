@@ -26,6 +26,7 @@ exports.default = async (name) => {
         process.exit();
     }
     let mod;
+    console.log('Fetching...');
     if (/\d+/.test(name)){
         let mod =await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/${name}`)).json()
         console.log(mod)
@@ -38,7 +39,7 @@ exports.default = async (name) => {
         }
         let que = [];
         for (let i of mods_list) {
-            que.push(`${chalk.blueBright(i.name)} ${chalk.black("by")} ${i.authors[0].name}`)
+            que.push(`\x1b[1m${i.name}\x1b[0m by ${i.authors[0].name}`)
         }
         let ans = await inquirer.prompt([
             {

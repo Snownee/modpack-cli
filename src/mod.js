@@ -1,4 +1,4 @@
 exports.init = require("./init").default
 exports.add = require("./add").default
-exports.install = require("./install").default
-exports.pack = require("./pack").default
+exports.update = require("./update").default
+exports.build = require("./build").default
