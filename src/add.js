@@ -44,9 +44,11 @@ exports.default = async (name) => {
         console.log(chalk.red(`[Crane]: already exist this mod!`));
         process.exit();
     }
+    let mod_all_files = (await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/${mod.id}/files`)).json())
+    mod_all_files = mod_all_files.sort((i,j)=>(new Date(i.fileDate).getTime() > new Date(j.fileDate).getTime()?-1:1))
     let mod_file = [];
     let mod_file_infos = [];
-    for (let i of mod.latestFiles){
+    for (let i of mod_all_files){
         let is_ok = i.gameVersion.filter((j)=>j===cfg.mcversion);
         if (is_ok.length > 0){
             mod_file.push(i);
@@ -67,7 +69,8 @@ exports.default = async (name) => {
     const dl = new DownloaderHelper(file.downloadUrl, mods,{override:true});
     dl.on('end', () => {
         console.log(chalk.green(`[Crane]: mod ${mod.name} install succeed!`));
-        mods_cfg.push({addon_id:mod.id,file_id:file.id,file_name:file.displayName,dl_url:file.downloadUrl,dependencies:file.dependencies});
+        mods_cfg.push({addon_id:mod.id,file_id:file.id,name:mod.name,
+            file_name:file.displayName,dl_url:file.downloadUrl,dependencies:file.dependencies});
         fs.writeFileSync(path.join(root, 'crane-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
     })
     await dl.start();

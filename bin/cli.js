@@ -19,5 +19,10 @@ const chalk = require('chalk');
         .action(async (name, cmd) => {
             await tasks.add(name);
         })
+    commander
+        .command('install')
+        .action(async (cmd) => {
+            await tasks.install();
+        })
     commander.parse(process.argv);
 })()
