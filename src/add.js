@@ -10,9 +10,18 @@ exports.default = async (name) => {
     const root = process.cwd();
     console.log(chalk.blue(`[Crane]: add mod ${name} in ${root}`));
     const mods = path.join(root,"mods");
-    let mods_cfg = JSON.parse(fs.readFileSync(path.join(root,"crane-mods.json")))
-    let cfg = JSON.parse(fs.readFileSync(path.join(root,"crane-project.json")))//Json parse失败
-    await makeDir(mods);//mods无法mkdir
+    let mods_cfg;
+    let cfg ;
+    try {
+        mods_cfg = JSON.parse(fs.readFileSync(path.join(root,"crane-mods.json")));
+        cfg = JSON.parse(fs.readFileSync(path.join(root,"crane-project.json")));
+        await makeDir(mods);
+
+    }
+    catch (e) {
+        console.log(chalk.red(`${e}`));
+        process.exit();
+    }
     let mod;
     if (/\d+/.test(name)){
         let mod =await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/${name}`)).json()
