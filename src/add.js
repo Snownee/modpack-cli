@@ -5,6 +5,7 @@ const fs = require('fs');
 const inquirer = require('inquirer')
 const fetch = require('node-fetch');
 const { DownloaderHelper } = require('node-downloader-helper');
+const { byteHelper, inlineLog } = require('./helpers');
 const logger = require('./logger');
 
 exports.default = async (name) => {
@@ -23,14 +24,13 @@ exports.default = async (name) => {
         makeDir.sync(mods);
     }
     catch (e) {
-        console.error(chalk.red(e));
+        logger.failure(e);
         process.exit();
     }
     let mod;
-    console.log('Fetching...');
+    logger.info('Fetching...');
     if (/\d+/.test(name)){
         let mod =await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/${name}`)).json()
-        console.log(mod)
     }
     else {
         mods_list = await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/search?sectionId=6&gameId=432&gameVersion=${cfg.mcversion}&searchFilter=${name}`)).json()
@@ -38,6 +38,7 @@ exports.default = async (name) => {
             logger.failure(`Cannot find any mod!`);
             process.exit();
         }
+        logger.info(`Found ${mods_list.length} result(s)`)
         let que = [];
         for (let i of mods_list) {
             que.push(`${chalk.yellowBright(i.name)} by ${i.authors[0].name}`)
@@ -80,8 +81,11 @@ exports.default = async (name) => {
     ])
     let index = mod_file_infos.findIndex((i)=>i===ans.mod);
     let file = mod_file[index];
+    let startTime = new Date();
     const dl = new DownloaderHelper(file.downloadUrl, mods,{override:true});
     dl.on('end', () => {
+        process.stdout.clearLine();
+        process.stdout.cursorTo(0);
         logger.success(`Mod ${mod.name} installed!`);
         mods_cfg.push({
             addon_id: mod.id,
@@ -93,6 +97,20 @@ exports.default = async (name) => {
             dependencies: file.dependencies
         });
         fs.writeFileSync(path.join(root, 'crane-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
+    })
+    dl.on('progress', stats => {
+        const progress = stats.progress.toFixed(1);
+        const speed = byteHelper(stats.speed);
+        const downloaded = byteHelper(stats.downloaded);
+        const total = byteHelper(stats.total);
+
+        // print every one second
+        const currentTime = new Date();
+        const elaspsedTime = currentTime - startTime;
+        if (elaspsedTime > 1000) {
+            startTime = currentTime;
+            inlineLog(`${speed}/s - ${progress}% [${downloaded}/${total}]`);
+        }
     })
     await dl.start();
 }
