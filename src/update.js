@@ -65,7 +65,7 @@ async function download(mod, cfg) {
         return true
     })
     if (all_files.length === 0) {
-        logger.info(`${mod.name} has no updates`)
+        logger.info(`${mod.name} is already up to date`)
         return Promise.resolve()
     }
     all_files = all_files.sort((i,j)=>(new Date(i.fileDate).getTime() > new Date(j.fileDate).getTime()?-1:1))
@@ -80,11 +80,14 @@ async function download(mod, cfg) {
         httpsRequestOptions: options,
         override: true
     });
+    let new_version = file.displayName
+    if (new_version.endsWith('.jar'))
+        new_version = new_version.substring(0,new_version.length-4)
     return new Promise((resolve, reject) => {
         dl.on('end', () => {
             logger.success(`Download ${file.fileName} successfully!`);
             mod.date = file.fileDate
-            mod.new_version = file.displayName
+            mod.new_version = new_version
             resolve()
         })
         dl.start();
