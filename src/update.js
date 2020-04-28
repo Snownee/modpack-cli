@@ -5,6 +5,7 @@ const makeDir = require('make-dir');
 const logger = require('./logger');
 const fetch = require('node-fetch');
 const http = require('http');
+const helpers = require('./helpers');
 
 exports.default = async () => {
     const root = process.cwd();
@@ -36,7 +37,7 @@ async function download(mod, cfg) {
     if (mod.strategy === 'none')
         return Promise.resolve()
     logger.info(`Fetching ${mod.name}...`)
-    const content = await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/${mod.addon_id}/files`);
+    const content = await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/${mod.addon_id}/files`, helpers.options(cfg));
     let all_files = await content.json();
     logger.info(`Sorting ${mod.name}...`)
     all_files = all_files.filter(f => {
@@ -74,7 +75,7 @@ async function download(mod, cfg) {
     const root = process.cwd();
     const mods = path.join(root,"mods");
     logger.info(`Downloading ${file.fileName}...`)
-    const options = require('./helpers').options(cfg)
+    const options = helpers.options(cfg)
     const dl = new DownloaderHelper(file.downloadUrl, mods, {
         httpRequestOptions: options,
         httpsRequestOptions: options,
