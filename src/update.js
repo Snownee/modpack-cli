@@ -20,10 +20,11 @@ exports.default = async () => {
     let mods_cfg = JSON.parse(fs.readFileSync(path.join(root,"modpack-mods.json")))
     let cfg = JSON.parse(fs.readFileSync(path.join(root,"modpack-project.json")));
     makeDir.sync(mods);
+    let promises = []
     for (let mod of mods_cfg){
-        await download(mod, cfg)
+        promises.push( download(mod, cfg) )
     }
-    console.log(mods_cfg);
+    await Promise.allSettled(promises)
     fs.writeFileSync(path.join(root, 'modpack-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
 }
 
