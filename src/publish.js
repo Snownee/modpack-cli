@@ -24,10 +24,31 @@ exports.default = async (includes) => {
     else if (ans.releaseType === 'minor')
         cfg.version.patch = 0
     fs.writeFileSync(path.join(root, 'modpack-project.json'), JSON.stringify(cfg, '\n', 2))
-    logger.info(`Current version is ${cfg.version.major}.${cfg.version.minor}.${cfg.version.patch}`)
+    const ver = `${cfg.version.major}.${cfg.version.minor}.${cfg.version.patch}`
+    logger.info(`Current version is ${ver}`)
     await manager.build(includes)
+    let additions = []
+    let updates = []
     for (let mod of mods_cfg) {
+        if (mod.old_version === undefined) {
+            additions.push(mod)
+        } else if (mod.old_version !== mod.new_version) {
+            updates.push(mod)
+            // updates += `${mod.old_version} -> ${mod.new_version}\n`
+        }
         mod.old_version = mod.new_version
     }
+    let log = `# ${cfg.name} ${ver}\n`
+    if (additions.length > 0) {
+        log += '\n## Added\n\n'
+        for (let mod of additions)
+            log += ` - [${mod.name}](https://www.curseforge.com/minecraft/mc-mods/${mod.slug})\n`
+    }
+    if (updates.length > 0) {
+        log += '\n## Updated\n\n'
+        for (let mod of updates)
+            log += ` - [${mod.name}](https://www.curseforge.com/minecraft/mc-mods/${mod.slug}) - ${mod.old_version} -> ${mod.new_version}\n`
+    }
+    fs.writeFileSync(path.join(root, 'build', `${cfg.name}-${ver}.md`), log)
     fs.writeFileSync(path.join(root, 'modpack-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
 }
