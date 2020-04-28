@@ -1,1 +1,5 @@
 # Modpack
+
+```
+npm install modpack
+```

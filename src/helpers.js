@@ -1,6 +1,7 @@
 /*eslint no-console: ["error", { allow: ["log", "warn", "error"] }] */
 const { URL } = require('url');
 const { existsSync } = require('fs');
+const ProxyAgent = require('simple-proxy-agent');
 
 // Console colors
 module.exports.COLOR_NC = '\033[0m'; // No Color \e
@@ -46,5 +47,15 @@ module.exports.isValidPath = function (path) {
         return existsSync(path);
     } catch (_) {
         return false;
+    }
+};
+
+module.exports.options = function (cfg) {
+    if (cfg.proxy) {
+        return {
+            agent: new ProxyAgent(cfg.proxy)
+        }
+    } else {
+        return {}
     }
 };

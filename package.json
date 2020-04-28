@@ -6,7 +6,12 @@
   "scripts": {
     "postinstall": ""
   },
-  "keywords": ["curseforge", "minecraft", "mod", "management"],
+  "keywords": [
+    "curseforge",
+    "minecraft",
+    "mod",
+    "management"
+  ],
   "author": "Snownee",
   "license": "MIT",
   "dependencies": {
@@ -17,7 +22,8 @@
     "inquirer": "^7.1.0",
     "make-dir": "^3.1.0",
     "node-downloader-helper": "^1.0.12",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.0",
+    "simple-proxy-agent": "^1.0.7"
   },
   "bin": "./bin/cli.js"
 }

@@ -11,7 +11,7 @@ const chalk = require('chalk');
 
     commander
         .command('init')
-        .action(async ( cmd) => {
+        .action(async (cmd) => {
             await tasks.init();
         })
     commander
@@ -28,6 +28,11 @@ const chalk = require('chalk');
         .command('build [includes]')
         .action(async (includes, cmd) => {
             await tasks.build(includes);
+        })
+    commander
+        .command('publish [includes]')
+        .action(async (includes, cmd) => {
+            await tasks.publish(includes);
         })
     commander.parse(process.argv);
 })()
