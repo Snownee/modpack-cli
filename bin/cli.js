@@ -7,7 +7,7 @@ const chalk = require('chalk');
 (async () => {
     commander
         .version('0.0.1')
-        .description('do for minecraft modpack!');
+        .description('Minecraft modpack management cli');
 
     commander
         .command('init')

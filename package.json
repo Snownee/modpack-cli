@@ -1,6 +1,6 @@
 {
   "name": "modpack",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -12,6 +12,13 @@
     "mod",
     "management"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Snownee/modpack-cli"
+  },
+  "bugs": {
+    "url": "https://github.com/Snownee/modpack-cli/issues"
+  },
   "author": "Snownee",
   "license": "MIT",
   "dependencies": {
