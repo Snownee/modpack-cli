@@ -19,26 +19,31 @@ const path = require('path');
 
     commander
         .command('init')
+        .description('Init a new modpack environment in this folder!')
         .action(async (cmd) => {
             await tasks.init();
         })
     commander
         .command('add <name>')
+        .description('Add the mod in this modpack!')
         .action(async (name, cmd) => {
             await tasks.add(name);
         })
     commander
         .command('update')
+        .description('Update add mods!')
         .action(async (cmd) => {
             await tasks.update();
         })
     commander
         .command('build [includes]')
+        .description('build this modpack!')
         .action(async (includes, cmd) => {
             await tasks.build(includes);
         })
     commander
         .command('publish [includes]')
+        .description('publish this modpack!')
         .action(async (includes, cmd) => {
             await tasks.publish(includes);
         })
