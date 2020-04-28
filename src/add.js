@@ -5,7 +5,7 @@ const fs = require('fs');
 const inquirer = require('inquirer')
 const fetch = require('node-fetch');
 const { DownloaderHelper } = require('node-downloader-helper');
-const { byteHelper, inlineLog } = require('./helpers');
+const { byteHelper, inlineLog, options } = require('./helpers');
 const logger = require('./logger');
 
 exports.default = async (name) => {
@@ -30,10 +30,10 @@ exports.default = async (name) => {
     let mod;
     logger.info('Fetching...');
     if (/\d+/.test(name)){
-        let mod =await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/${name}`)).json()
+        let mod =await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/${name}`, options(cfg))).json()
     }
     else {
-        mods_list = await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/search?sectionId=6&gameId=432&gameVersion=${cfg.mcversion}&searchFilter=${name}`)).json()
+        mods_list = await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/search?sectionId=6&gameId=432&gameVersion=${cfg.mcversion}&searchFilter=${name}`, options(cfg))).json()
         if (mods_list.length === 0){
             logger.failure(`Cannot find any mod!`);
             process.exit();
@@ -41,6 +41,8 @@ exports.default = async (name) => {
         logger.info(`Found ${mods_list.length} result(s)`)
         let que = [];
         for (let i of mods_list) {
+            if (cfg.modloader === 'forge' && i.name.toLowerCase().includes('fabric') && !name.toLowerCase().includes('fabric')) continue
+            if (cfg.modloader === 'fabric' && i.name.toLowerCase().includes('forge') && !name.toLowerCase().includes('forge')) continue
             que.push(`${chalk.yellowBright(i.name)} by ${i.authors[0].name}`)
         }
         let ans = await inquirer.prompt([
