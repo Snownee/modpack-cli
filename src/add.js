@@ -41,6 +41,8 @@ exports.default = async (name) => {
         logger.info(`Found ${mods_list.length} result(s)`)
         let que = [];
         for (let i of mods_list) {
+            if (cfg.modloader === 'forge' && i.name.toLowerCase().includes('fabric') && !name.toLowerCase().includes('fabric')) continue
+            if (cfg.modloader === 'fabric' && i.name.toLowerCase().includes('forge') && !name.toLowerCase().includes('forge')) continue
             que.push(`${chalk.yellowBright(i.name)} by ${i.authors[0].name}`)
         }
         let ans = await inquirer.prompt([
