@@ -3,10 +3,18 @@
 const commander = require('commander');
 const tasks = require("../src/mod");
 const chalk = require('chalk');
+const fs = require('fs');
+const path = require('path');
+
 //https://github.com/tj/commander.js#action-handler-subcommands
 (async () => {
+    let version = "undefined";
+    try{
+        version = JSON.parse(fs.readFileSync(path.join(__dirname,"..","package.json"))).version;
+    }catch (e) {
+    }
     commander
-        .version('0.0.1')
+        .version(`modpack version ${version}`)
         .description('Minecraft modpack management CLI');
 
     commander
