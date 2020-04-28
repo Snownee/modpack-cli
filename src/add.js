@@ -59,14 +59,12 @@ exports.default = async (name) => {
         logger.failure(`Already exist this mod!`);
         process.exit();
     }
-    let strategies = [ "beta", "release", "alpha", "none" ]
     let ans = await inquirer.prompt([
         {
             type: 'list',
             name: 'strategy',
             message: chalk.red('Choose updating strategy:'),
-            default: 0,
-            choices: strategies
+            choices: [ "beta", "release", "alpha", "none" ]
         }
     ])
     logger.success(`Mod ${mod.name} added!`);

@@ -23,6 +23,10 @@ exports.default = async () => {
     let promises = []
     for (let mod of mods_cfg){
         promises.push( download(mod, cfg) )
+        if (promises.length > 4) {
+            await Promise.allSettled(promises)
+            promises = []
+        }
     }
     await Promise.allSettled(promises)
     fs.writeFileSync(path.join(root, 'modpack-mods.json'), JSON.stringify(mods_cfg, '\n', 2))

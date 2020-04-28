@@ -74,5 +74,6 @@ exports.default = async (includes) => {
 
     zip.writeZip(path.join(root, 'build', `${cfg.name}-${cfg.version.major}.${cfg.version.minor}.${cfg.version.patch}.zip`));
 
+    logger.success('Done!')
 
 }
