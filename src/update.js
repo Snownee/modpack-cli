@@ -21,19 +21,18 @@ exports.default = async () => {
     let cfg = JSON.parse(fs.readFileSync(path.join(root,"modpack-project.json")));
     makeDir.sync(mods);
     for (let mod of mods_cfg){
-        download(mod, cfg)
+        await download(mod, cfg)
     }
+    console.log(mods_cfg);
+    fs.writeFileSync(path.join(root, 'modpack-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
 }
 
 async function download(mod, cfg) {
     if (mod.strategy === 'none')
-        return
+        return Promise.resolve()
     logger.info(`Fetching ${mod.name}...`)
-    let all_files = (
-      await (
-        await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/${mod.addon_id}/files`)
-      ).json()
-    )
+    const content = await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/${mod.addon_id}/files`);
+    let all_files = await content.json();
     logger.info(`Sorting ${mod.name}...`)
     all_files = all_files.filter(f => {
         if (!f.isAvailable)
@@ -62,7 +61,7 @@ async function download(mod, cfg) {
     })
     if (all_files.length === 0) {
         logger.info(`${mod.name} has no updates`)
-        return
+        return Promise.resolve()
     }
     all_files = all_files.sort((i,j)=>(new Date(i.fileDate).getTime() > new Date(j.fileDate).getTime()?-1:1))
     const file = all_files[0]
@@ -76,8 +75,13 @@ async function download(mod, cfg) {
         httpsRequestOptions: options,
         override: true
     });
-    dl.on('end', () => {
-        logger.success(`${i.name} download succeed!`);
-    })
-    dl.start();
+    return new Promise((resolve, reject) => {
+        dl.on('end', () => {
+            logger.success(`Download ${file.fileName} successfully!`);
+            mod.date = file.fileDate
+            mod.new_version = file.displayName
+            resolve()
+        })
+        dl.start();
+    });
 }
