@@ -1,6 +1,6 @@
 {
   "name": "modpack",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Minecraft modpack management CLI",
   "main": "index.js",
   "scripts": {
