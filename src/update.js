@@ -17,9 +17,13 @@ exports.default = async () => {
         process.exit();
     }
 
-    logger.info(`Install modpack in ${root}`);
+    logger.info(`Checking updates...`);
     let mods_cfg = JSON.parse(fs.readFileSync(path.join(root,"modpack-mods.json")))
     let cfg = JSON.parse(fs.readFileSync(path.join(root,"modpack-project.json")));
+    if (!cfg.check_interval) {
+        cfg.check_interval = 3 * 24 * 3600000 // 3 days
+        fs.writeFileSync(path.join(root, 'modpack-project.json'), JSON.stringify(cfg, '\n', 2))
+    }
     makeDir.sync(mods);
     let promises = []
     for (let mod of mods_cfg){
@@ -27,6 +31,7 @@ exports.default = async () => {
         if (promises.length > 4) {
             await Promise.allSettled(promises)
             promises = []
+            fs.writeFileSync(path.join(root, 'modpack-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
         }
     }
     await Promise.allSettled(promises)
@@ -36,6 +41,10 @@ exports.default = async () => {
 async function download(mod, cfg) {
     if (mod.strategy === 'none')
         return Promise.resolve()
+    if ( mod.last_check && (new Date(mod.last_check).getTime() + cfg.check_interval) > new Date().getTime() ) {
+        logger.info(`Skipping ${mod.name}...`)
+        return Promise.resolve()
+    }
     logger.info(`Fetching ${mod.name}...`)
     const content = await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/${mod.addon_id}/files`, helpers.options(cfg));
     let all_files = await content.json();
@@ -48,7 +57,7 @@ async function download(mod, cfg) {
         const strategy_id = strategies.indexOf(mod.strategy) + 2;
         if (f.releaseType > strategy_id)
             return false
-        if (new Date(f.fileDate).getTime() <= new Date(mod.date))
+        if (new Date(f.fileDate) <= new Date(mod.date))
             return false
         if (!f.gameVersion.includes(cfg.mcversion))
             return false
@@ -67,6 +76,7 @@ async function download(mod, cfg) {
     })
     if (all_files.length === 0) {
         logger.info(`${mod.name} is already up to date`)
+        mod.last_check = new Date()
         return Promise.resolve()
     }
     all_files = all_files.sort((i,j)=>(new Date(i.fileDate).getTime() > new Date(j.fileDate).getTime()?-1:1))
@@ -89,6 +99,7 @@ async function download(mod, cfg) {
             logger.success(`Download ${file.fileName} successfully!`);
             mod.date = file.fileDate
             mod.new_version = new_version
+            mod.last_check = new Date()
             resolve()
         })
         dl.start();

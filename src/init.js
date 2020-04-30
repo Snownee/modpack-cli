@@ -33,7 +33,7 @@ exports.default = async () => {
             name: 'modloader',
             message: chalk.red('Modloader?'),
             default: 0,
-            choices:["forge","fabric"]
+            choices: ["forge", "fabric"]
         }
     ])
     ans.version = {
@@ -41,6 +41,7 @@ exports.default = async () => {
         minor: 0,
         patch: 0
     }
+    ans.check_interval = 3 * 24 * 3600000 // 3 days
     makeDir.sync(path.join(root, 'mods'))
     makeDir.sync(path.join(root, 'build'))
     makeDir.sync(path.join(root, 'modpack_includes'))

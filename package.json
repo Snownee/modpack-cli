@@ -1,6 +1,6 @@
 {
   "name": "modpack",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Minecraft modpack management CLI",
   "main": "index.js",
   "scripts": {
@@ -32,5 +32,5 @@
     "node-fetch": "^2.6.0",
     "simple-proxy-agent": "^1.0.7"
   },
-  "bin": "./bin/cli.js"
+  "bin": "./bin/modpack.js"
 }
