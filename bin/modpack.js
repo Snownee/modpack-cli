@@ -32,8 +32,9 @@ const path = require('path');
     commander
         .command('update [mod_name]')
         .description('Update add mods!')
+        .option("-f, --force","disable check update!")
         .action(async (mod_name, cmd) => {
-            await tasks.update(mod_name);
+            await tasks.update(mod_name,cmd.force);
         })
     commander
         .command('remove [mod_name]')

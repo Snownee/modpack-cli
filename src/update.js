@@ -8,7 +8,8 @@ const http = require('http');
 const helpers = require('./helpers');
 const md5File = require('md5-file')
 
-exports.default = async (mod_name) => {
+exports.default = async (mod_name, force) => {
+    console.log(mod_name)
     const root = process.cwd();
     const mods = path.join(root, "mods");
     try {
@@ -29,8 +30,9 @@ exports.default = async (mod_name) => {
     let promises = []
     for (let mod of mods_cfg) {
         if (!mod_name || new RegExp(mod_name).test(mod.name)) {
-            cfg.check_interval = 0;
-            promises.push(download(mod, cfg))
+            let cfg_cpy = {...cfg};
+            cfg_cpy.check_interval = 0;
+            promises.push(download(mod, cfg_cpy, force))
         }
         if (promises.length > 4) {
             await Promise.allSettled(promises)
@@ -42,63 +44,67 @@ exports.default = async (mod_name) => {
     fs.writeFileSync(path.join(root, 'modpack-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
 }
 
-async function download(mod, cfg) {
-    if (mod.strategy === 'none')
-        return Promise.resolve()
-    if (mod.last_check && (new Date(mod.last_check).getTime() + cfg.check_interval) > new Date().getTime()) {
-        logger.info(`Skipping ${mod.name}...`)
-        return Promise.resolve()
-    }
-    logger.info(`Fetching ${mod.name}...`)
-    const content = await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/${mod.addon_id}/files`, helpers.options(cfg));
-    let all_files = await content.json();
-    logger.info(`Sorting ${mod.name}...`)
-    all_files = all_files.filter(f => {
-        if (!f.isAvailable)
-            return false
-        // 1: R 2: B 3: A
-        const strategies = ['beta', 'alpha']
-        const strategy_id = strategies.indexOf(mod.strategy) + 2;
-        if (f.releaseType > strategy_id)
-            return false
-        if (new Date(f.fileDate) <= new Date(mod.date))
-            return false
-        if (!f.gameVersion.includes(cfg.mcversion))
-            return false
-        if (cfg.modloader === 'forge') {
-            if (f.fileName.toLowerCase().includes('fabric'))
-                return false
-            if (f.gameVersion.includes('Fabric') && !f.gameVersion.includes('Forge'))
-                return false
-        } else if (cfg.modloader === 'fabric') {
-            if (f.fileName.toLowerCase().includes('forge'))
-                return false
-            if (f.gameVersion.includes('Forge') && !f.gameVersion.includes('Fabric'))
-                return false
-        }
-        return true
-    })
-    if (all_files.length === 0) {
-        logger.info(`${mod.name} is already up to date`)
-        mod.last_check = new Date()
-        return Promise.resolve()
-    }
-    all_files = all_files.sort((i, j) => (new Date(i.fileDate).getTime() > new Date(j.fileDate).getTime() ? -1 : 1))
-    const file = all_files[0]
-    mod.new_version = file.displayName
+async function download(mod, cfg, force) {
+    let file = {};
     const root = process.cwd();
     const mods = path.join(root, "mods");
+    if (mod.download_url) {
+        file = mod;
+    } else {
+        if (mod.strategy === 'none')
+            return Promise.resolve()
+        if (!force && mod.last_check && (new Date(mod.last_check).getTime() + cfg.check_interval) > new Date().getTime()) {
+            logger.info(`Skipping ${mod.name}...`)
+            return Promise.resolve()
+        }
+        logger.info(`Fetching ${mod.name}...`)
+        const content = await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/${mod.addon_id}/files`, helpers.options(cfg));
+        let all_files = await content.json();
+        logger.info(`Sorting ${mod.name}...`)
+        all_files = all_files.filter(f => {
+            if (!f.isAvailable)
+                return false
+            // 1: R 2: B 3: A
+            const strategies = ['beta', 'alpha']
+            const strategy_id = strategies.indexOf(mod.strategy) + 2;
+            if (f.releaseType > strategy_id)
+                return false
+            if (!force && new Date(f.fileDate) <= new Date(mod.date))
+                return false
+            if (!f.gameVersion.includes(cfg.mcversion))
+                return false
+            if (cfg.modloader === 'forge') {
+                if (f.fileName.toLowerCase().includes('fabric'))
+                    return false
+                if (f.gameVersion.includes('Fabric') && !f.gameVersion.includes('Forge'))
+                    return false
+            } else if (cfg.modloader === 'fabric') {
+                if (f.fileName.toLowerCase().includes('forge'))
+                    return false
+                if (f.gameVersion.includes('Forge') && !f.gameVersion.includes('Fabric'))
+                    return false
+            }
+            return true
+        })
+        if (all_files.length === 0) {
+            logger.info(`${mod.name} is already up to date`)
+            mod.last_check = new Date()
+            return Promise.resolve()
+        }
+        all_files = all_files.sort((i, j) => (new Date(i.fileDate).getTime() > new Date(j.fileDate).getTime() ? -1 : 1))
+        file = all_files[0]
+        mod.new_version = file.displayName
+    }
+
     logger.info(`Downloading ${file.fileName}...`)
     const options = helpers.options(cfg)
-    {
-        let files = fs.readdirSync(mods);
-        for (let i of files) {
-            let file_name = path.join(mods, i);
-            if (fs.statSync(file_name).isFile()) {
-                if (md5File.sync(file_name) === mod.md5) {
-                    fs.unlinkSync(file_name);
-                    logger.info(`delete old file ${i}`);
-                }
+    let files = fs.readdirSync(mods);
+    for (let i of files) {
+        let file_name = path.join(mods, i);
+        if (fs.statSync(file_name).isFile()) {
+            if (md5File.sync(file_name) === mod.md5) {
+                fs.unlinkSync(file_name);
+                logger.info(`delete old file ${i}`);
             }
         }
     }
