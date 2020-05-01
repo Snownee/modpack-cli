@@ -74,8 +74,7 @@ exports.default = async (name) => {
         addon_id: mod.id,
         slug: mod.slug,
         name: mod.name,
-        strategy: ans.strategy,
-        date: new Date(2000, 0, 0)
+        strategy: ans.strategy
     });
     fs.writeFileSync(path.join(root, 'modpack-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
     /*

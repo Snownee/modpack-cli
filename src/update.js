@@ -73,7 +73,7 @@ async function download(mod, cfg, cache) {
         const strategy_id = strategies.indexOf(mod.strategy) + 2;
         if (f.releaseType > strategy_id)
             return false
-        if (new Date(f.fileDate) <= new Date(mod.date))
+        if (cache.date && new Date(f.fileDate) <= new Date(cache.date))
             return false
         if (!f.gameVersion.includes(cfg.mcversion))
             return false
