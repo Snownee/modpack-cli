@@ -125,7 +125,8 @@ async function download(mod, cfg, cache, force) {
         httpRequestOptions: options,
         httpsRequestOptions: options,
         fileName: file.fileName,
-        override: true
+        override: true,
+        retry: cfg.retry
     });
     let new_version = file.displayName
     if (new_version.endsWith('.jar'))
