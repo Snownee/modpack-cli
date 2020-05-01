@@ -33,6 +33,5 @@ exports.default = async () => {
         // names must be equal
         return 0;
     } )
-    console.log(output);
     console.table(output)
 }
