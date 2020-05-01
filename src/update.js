@@ -1,15 +1,16 @@
 const fs = require('fs');
 const path = require('path');
-const { DownloaderHelper } = require('node-downloader-helper');
+const {DownloaderHelper} = require('node-downloader-helper');
 const makeDir = require('make-dir');
 const logger = require('./logger');
 const fetch = require('node-fetch');
 const http = require('http');
 const helpers = require('./helpers');
+const md5File = require('md5-file')
 
-exports.default = async () => {
+exports.default = async (mod_name) => {
     const root = process.cwd();
-    const mods = path.join(root,"mods");
+    const mods = path.join(root, "mods");
     try {
         makeDir.sync(mods);//mods无法mkdir
     } catch (e) {
@@ -35,7 +36,10 @@ exports.default = async () => {
     for (let mod of mods_cfg) {
         if (!cache[`m${addon_id}`])
             cache[`m${addon_id}`] = {}
-        promises.push( download(mod, cfg, cache[`m${addon_id}`]) )
+        if (!mod_name || new RegExp(mod_name).test(mod.name)) {
+            cfg.check_interval = 0;
+            promises.push( download(mod, cfg, cache[`m${addon_id}`]) )
+        }
         if (promises.length > 4) {
             await Promise.allSettled(promises)
             promises = []
@@ -53,7 +57,7 @@ exports.default = async () => {
 async function download(mod, cfg, cache) {
     if (mod.strategy === 'none')
         return Promise.resolve()
-    if ( mod.last_check && (new Date(cache.last_check).getTime() + cfg.check_interval) > new Date().getTime() ) {
+    if ( cache.last_check && (new Date(cache.last_check).getTime() + cfg.check_interval) > new Date().getTime() ) {
         logger.info(`Skipping ${mod.name}...`)
         return Promise.resolve()
     }
@@ -91,28 +95,41 @@ async function download(mod, cfg, cache) {
         cache.last_check = new Date()
         return Promise.resolve()
     }
-    all_files = all_files.sort((i,j)=>(new Date(i.fileDate).getTime() > new Date(j.fileDate).getTime()?-1:1))
+    all_files = all_files.sort((i, j) => (new Date(i.fileDate).getTime() > new Date(j.fileDate).getTime() ? -1 : 1))
     const file = all_files[0]
     mod.new_version = file.displayName
     const root = process.cwd();
-    const mods = path.join(root,"mods");
+    const mods = path.join(root, "mods");
     logger.info(`Downloading ${file.fileName}...`)
     const options = helpers.options(cfg)
+    {
+        let files = fs.readdirSync(mods);
+        for (let i of files) {
+            let file_name = path.join(mods, i);
+            if (fs.statSync(file_name).isFile()) {
+                if (md5File.sync(file_name) === mod.md5) {
+                    fs.unlinkSync(file_name);
+                    logger.info(`delete old file ${i}`);
+                }
+            }
+        }
+    }
     const dl = new DownloaderHelper(file.downloadUrl, mods, {
         httpRequestOptions: options,
         httpsRequestOptions: options,
-        fileName:file.fileName,
+        fileName: file.fileName,
         override: true
     });
     let new_version = file.displayName
     if (new_version.endsWith('.jar'))
-        new_version = new_version.substring(0,new_version.length-4)
+        new_version = new_version.substring(0, new_version.length - 4)
     return new Promise((resolve, reject) => {
         dl.on('end', () => {
             logger.success(`Download ${file.fileName} successfully!`);
             cache.date = file.fileDate
             mod.new_version = new_version
             cache.last_check = new Date()
+            mod.md5 = md5File.sync(`${mods}/${file.fileName}`)
             resolve()
         })
         dl.start();

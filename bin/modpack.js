@@ -30,10 +30,22 @@ const path = require('path');
             await tasks.add(name);
         })
     commander
-        .command('update')
+        .command('update [mod_name]')
         .description('Update add mods!')
+        .action(async (mod_name, cmd) => {
+            await tasks.update(mod_name);
+        })
+    commander
+        .command('remove [mod_name]')
+        .description('Remove mod!')
+        .action(async (mod_name, cmd) => {
+            await tasks.remove(mod_name);
+        })
+    commander
+        .command('list')
+        .description('list all mods!')
         .action(async (cmd) => {
-            await tasks.update();
+            await tasks.list();
         })
     commander
         .command('build [includes]')
