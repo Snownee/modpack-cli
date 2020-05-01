@@ -36,6 +36,12 @@ const path = require('path');
             await tasks.update(mod_name);
         })
     commander
+        .command('remove [mod_name]')
+        .description('Remove mod!')
+        .action(async (mod_name, cmd) => {
+            await tasks.remove(mod_name);
+        })
+    commander
         .command('list')
         .description('list all mods!')
         .action(async (cmd) => {
