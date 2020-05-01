@@ -36,7 +36,9 @@ exports.default = async (mod_name, force) => {
     for (let mod of mods_cfg) {
         if (!cache[`m${mod.addon_id}`])
             cache[`m${mod.addon_id}`] = {}
-        if (!mod_name || new RegExp(mod_name).test(mod.name)) {
+        if (!mod_name) {
+            promises.push( download(mod, cfg, cache[`m${mod.addon_id}`], force) )
+        } else if (new RegExp(mod_name).test(mod.name)) {
             let cfg_cpy = {...cfg};
             cfg_cpy.check_interval = 0;
             promises.push( download(mod, cfg_cpy, cache[`m${mod.addon_id}`], force) )
