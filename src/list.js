@@ -13,8 +13,26 @@ exports.default = async () => {
     logger.info(`list mods in ${root}`);
     const mods_cfg = path.join(root,"modpack-mods.json");
     let cfg = JSON.parse(fs.readFileSync(mods_cfg,{encoding:"utf-8"}));
-    console.log(chalk.green(`All ${cfg.length} mods!`));
-    for (let i of cfg){
-        console.log(chalk.yellow(i.name));
-    }
+    let lines = []
+    logger.success(chalk.green(`You have ${cfg.length} mod(s):`));
+    let output = cfg.map(mod => { return {
+        Name: mod.name,
+        Version: mod.new_version,
+        Strategy: mod.strategy
+    } } )
+    output.sort( (a, b) => {
+        let nameA = a.Name.toUpperCase(); // ignore upper and lowercase
+        let nameB = b.Name.toUpperCase(); // ignore upper and lowercase
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+
+        // names must be equal
+        return 0;
+    } )
+    console.log(output);
+    console.table(output)
 }
