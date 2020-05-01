@@ -42,7 +42,7 @@ exports.default = async () => {
         patch: 0
     }
     ans.check_interval = 3 * 24 * 3600000 // 3 days
-    ans.retry = { maxRetries: 2, delay: 30000 }
+    ans.retry = { maxRetries: 2, delay: 20000 }
     makeDir.sync(path.join(root, 'mods'))
     makeDir.sync(path.join(root, 'build'))
     makeDir.sync(path.join(root, 'modpack_includes'))

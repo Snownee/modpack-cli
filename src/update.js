@@ -137,8 +137,18 @@ async function download(mod, cfg, cache, force) {
             cache.date = file.fileDate
             mod.new_version = new_version
             cache.last_check = new Date()
-            mod.md5 = md5File.sync(`${mods}/${file.fileName}`)
+            mod.md5 = md5File.sync(path.join(mods,file.fileName))
             resolve()
+        })
+        dl.on('error', error => {
+            logger.failure(`Failed to download ${file.fileName}`)
+            logger.failure(error)
+        })
+        dl.on('timeout', () => {
+            logger.failure(`Download ${file.fileName} time out`)
+        })
+        dl.on('retry', () => {
+            logger.info(`Retry ${file.fileName}...`)
         })
         dl.start();
     });
