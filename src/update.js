@@ -101,6 +101,7 @@ async function download(mod, cfg, cache) {
     const dl = new DownloaderHelper(file.downloadUrl, mods, {
         httpRequestOptions: options,
         httpsRequestOptions: options,
+        fileName:file.fileName,
         override: true
     });
     let new_version = file.displayName
