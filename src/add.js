@@ -29,7 +29,7 @@ exports.default = async (name) => {
     }
     let mod;
     logger.info('Fetching...');
-    if (/\d+/.test(name)){
+    if (/^\d+$/.test(name)){
         let mod =await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/${name}`, options(cfg))).json()
     }
     else {
