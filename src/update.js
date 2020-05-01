@@ -34,11 +34,11 @@ exports.default = async (mod_name) => {
     makeDir.sync(mods);
     let promises = []
     for (let mod of mods_cfg) {
-        if (!cache[`m${addon_id}`])
-            cache[`m${addon_id}`] = {}
+        if (!cache[`m${mod.addon_id}`])
+            cache[`m${mod.addon_id}`] = {}
         if (!mod_name || new RegExp(mod_name).test(mod.name)) {
             cfg.check_interval = 0;
-            promises.push( download(mod, cfg, cache[`m${addon_id}`]) )
+            promises.push( download(mod, cfg, cache[`m${mod.addon_id}`]) )
         }
         if (promises.length > 4) {
             await Promise.allSettled(promises)

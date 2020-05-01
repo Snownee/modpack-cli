@@ -25,13 +25,13 @@ const path = require('path');
         })
     commander
         .command('add <name>')
-        .description('Add the mod in this modpack!')
+        .description('Add new mod to modpack!')
         .action(async (name, cmd) => {
             await tasks.add(name);
         })
     commander
         .command('update [mod_name]')
-        .description('Update add mods!')
+        .description('Update added mods!')
         .action(async (mod_name, cmd) => {
             await tasks.update(mod_name);
         })
