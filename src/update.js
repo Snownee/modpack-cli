@@ -43,7 +43,7 @@ exports.default = async (mod_name, force) => {
             cfg_cpy.check_interval = 0;
             promises.push( download(mod, cfg_cpy, cache[`m${mod.addon_id}`], force) )
         }
-        if (promises.length > 4) {
+        if (promises.length >= 5) {
             await Promise.allSettled(promises)
             promises = []
             fs.writeFileSync(path.join(root, 'modpack-mods.json'), JSON.stringify(mods_cfg, '\n', 2))

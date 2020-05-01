@@ -51,11 +51,14 @@ module.exports.isValidPath = function (path) {
 };
 
 module.exports.options = function (cfg) {
-    if (cfg.proxy) {
-        return {
-            agent: new ProxyAgent(cfg.proxy)
-        }
+    let ret = {}
+    if (!cfg.download_timeout) {
+        ret.timeout = 20000
     } else {
-        return {}
+        ret.timeout = cfg.download_timeout
     }
+    if (cfg.proxy) {
+        ret.agent = new ProxyAgent(cfg.proxy)
+    }
+    return ret
 };
