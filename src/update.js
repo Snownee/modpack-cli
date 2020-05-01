@@ -18,30 +18,42 @@ exports.default = async () => {
     }
 
     logger.info(`Checking updates...`);
+    let cache;
+    try {
+        cache = JSON.parse(fs.readFileSync(path.join(root,".modpack","cache.json")))
+    } catch (e) {
+        cache = {}
+    }
     let mods_cfg = JSON.parse(fs.readFileSync(path.join(root,"modpack-mods.json")))
-    let cfg = JSON.parse(fs.readFileSync(path.join(root,"modpack-project.json")));
+    let cfg = JSON.parse(fs.readFileSync(path.join(root,"modpack-project.json")))
     if (!cfg.check_interval) {
         cfg.check_interval = 3 * 24 * 3600000 // 3 days
         fs.writeFileSync(path.join(root, 'modpack-project.json'), JSON.stringify(cfg, '\n', 2))
     }
     makeDir.sync(mods);
     let promises = []
-    for (let mod of mods_cfg){
-        promises.push( download(mod, cfg) )
+    for (let mod of mods_cfg) {
+        if (!cache[`m${addon_id}`])
+            cache[`m${addon_id}`] = {}
+        promises.push( download(mod, cfg, cache[`m${addon_id}`]) )
         if (promises.length > 4) {
             await Promise.allSettled(promises)
             promises = []
             fs.writeFileSync(path.join(root, 'modpack-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
+            fs.writeFileSync(path.join(root,".modpack","cache.json"), JSON.stringify(cache))
         }
     }
-    await Promise.allSettled(promises)
-    fs.writeFileSync(path.join(root, 'modpack-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
+    if (promises.length > 0) {
+        await Promise.allSettled(promises)
+        fs.writeFileSync(path.join(root, 'modpack-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
+        fs.writeFileSync(path.join(root,".modpack","cache.json"), JSON.stringify(cache))
+    }
 }
 
-async function download(mod, cfg) {
+async function download(mod, cfg, cache) {
     if (mod.strategy === 'none')
         return Promise.resolve()
-    if ( mod.last_check && (new Date(mod.last_check).getTime() + cfg.check_interval) > new Date().getTime() ) {
+    if ( mod.last_check && (new Date(cache.last_check).getTime() + cfg.check_interval) > new Date().getTime() ) {
         logger.info(`Skipping ${mod.name}...`)
         return Promise.resolve()
     }
@@ -76,7 +88,7 @@ async function download(mod, cfg) {
     })
     if (all_files.length === 0) {
         logger.info(`${mod.name} is already up to date`)
-        mod.last_check = new Date()
+        cache.last_check = new Date()
         return Promise.resolve()
     }
     all_files = all_files.sort((i,j)=>(new Date(i.fileDate).getTime() > new Date(j.fileDate).getTime()?-1:1))
@@ -97,9 +109,9 @@ async function download(mod, cfg) {
     return new Promise((resolve, reject) => {
         dl.on('end', () => {
             logger.success(`Download ${file.fileName} successfully!`);
-            mod.date = file.fileDate
+            cache.date = file.fileDate
             mod.new_version = new_version
-            mod.last_check = new Date()
+            cache.last_check = new Date()
             resolve()
         })
         dl.start();
