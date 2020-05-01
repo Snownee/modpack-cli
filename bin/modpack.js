@@ -32,8 +32,8 @@ const path = require('path');
     commander
         .command('update [mod_name]')
         .description('Update add mods!')
-        .action(async (name, cmd) => {
-            await tasks.update();
+        .action(async (mod_name, cmd) => {
+            await tasks.update(mod_name);
         })
     commander
         .command('list')
