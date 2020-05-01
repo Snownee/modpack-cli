@@ -6,6 +6,7 @@ const logger = require('./logger');
 const fetch = require('node-fetch');
 const http = require('http');
 const helpers = require('./helpers');
+const md5File = require('md5-file')
 
 exports.default = async () => {
     const root = process.cwd();
@@ -86,6 +87,18 @@ async function download(mod, cfg) {
     const mods = path.join(root,"mods");
     logger.info(`Downloading ${file.fileName}...`)
     const options = helpers.options(cfg)
+    {
+        let files = fs.readdirSync(mods);
+        for (let i of files){
+            let file_name = path.join(mods,i);
+            if(fs.statSync(file_name).isFile()) {
+                if (md5File.sync(file_name) === mod.md5) {
+                    fs.unlinkSync(file_name);
+                    logger.info(`delete old file ${i}`);
+                }
+            }
+        }
+    }
     const dl = new DownloaderHelper(file.downloadUrl, mods, {
         httpRequestOptions: options,
         httpsRequestOptions: options,
@@ -101,6 +114,7 @@ async function download(mod, cfg) {
             mod.date = file.fileDate
             mod.new_version = new_version
             mod.last_check = new Date()
+            mod.md5 = md5File.sync(`${mods}/${file.fileName}`)
             resolve()
         })
         dl.start();

@@ -28,6 +28,7 @@
     "cpy": "^8.1.0",
     "inquirer": "^7.1.0",
     "make-dir": "^3.1.0",
+    "md5-file": "^5.0.0",
     "node-downloader-helper": "^1.0.12",
     "node-fetch": "^2.6.0",
     "simple-proxy-agent": "^1.0.7"
