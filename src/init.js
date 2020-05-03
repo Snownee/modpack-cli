@@ -44,6 +44,7 @@ exports.default = async () => {
     ans.check_interval = 3 * 24 * 3600000 // 3 days
     ans.retry = { maxRetries: 2, delay: 3000 }
     ans.download_timeout = 20000
+    and.max_download_threads = 5
     makeDir.sync(path.join(root, 'mods'))
     makeDir.sync(path.join(root, 'build'))
     makeDir.sync(path.join(root, 'modpack_includes'))

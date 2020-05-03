@@ -32,6 +32,10 @@ exports.default = async (mod_name, force) => {
         cfg.check_interval = 3 * 24 * 3600000 // 3 days
         fs.writeFileSync(path.join(root, 'modpack-project.json'), JSON.stringify(cfg, '\n', 2))
     }
+    if (!cfg.max_download_threads) {
+        cfg.max_download_threads = 5
+        fs.writeFileSync(path.join(root, 'modpack-project.json'), JSON.stringify(cfg, '\n', 2))
+    }
     makeDir.sync(mods);
     let promises = []
     for (let mod of mods_cfg) {
@@ -44,7 +48,7 @@ exports.default = async (mod_name, force) => {
             cfg_cpy.check_interval = 0;
             promises.push(download(mod, cfg_cpy, cache[`m${mod.addon_id}`], force))
         }
-        if (promises.length >= 5) {
+        if (promises.length >= cfg.max_download_threads) {
             await Promise.allSettled(promises)
             promises = []
             fs.writeFileSync(path.join(root, 'modpack-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
