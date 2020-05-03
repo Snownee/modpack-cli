@@ -20,13 +20,14 @@ exports.default = async (mod_name, force) => {
 
     logger.info(`Checking updates...`);
     let cache;
+    makeDir.sync(".modpack");
     try {
-        cache = JSON.parse(fs.readFileSync(path.join(root,".modpack","cache.json")))
+        cache = JSON.parse(fs.readFileSync(path.join(root, ".modpack", "cache.json")))
     } catch (e) {
         cache = {}
     }
-    let mods_cfg = JSON.parse(fs.readFileSync(path.join(root,"modpack-mods.json")))
-    let cfg = JSON.parse(fs.readFileSync(path.join(root,"modpack-project.json")))
+    let mods_cfg = JSON.parse(fs.readFileSync(path.join(root, "modpack-mods.json")))
+    let cfg = JSON.parse(fs.readFileSync(path.join(root, "modpack-project.json")))
     if (!cfg.check_interval) {
         cfg.check_interval = 3 * 24 * 3600000 // 3 days
         fs.writeFileSync(path.join(root, 'modpack-project.json'), JSON.stringify(cfg, '\n', 2))
@@ -37,23 +38,23 @@ exports.default = async (mod_name, force) => {
         if (!cache[`m${mod.addon_id}`])
             cache[`m${mod.addon_id}`] = {}
         if (!mod_name) {
-            promises.push( download(mod, cfg, cache[`m${mod.addon_id}`], force) )
+            promises.push(download(mod, cfg, cache[`m${mod.addon_id}`], force))
         } else if (new RegExp(mod_name).test(mod.name)) {
             let cfg_cpy = {...cfg};
             cfg_cpy.check_interval = 0;
-            promises.push( download(mod, cfg_cpy, cache[`m${mod.addon_id}`], force) )
+            promises.push(download(mod, cfg_cpy, cache[`m${mod.addon_id}`], force))
         }
         if (promises.length >= 5) {
             await Promise.allSettled(promises)
             promises = []
             fs.writeFileSync(path.join(root, 'modpack-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
-            fs.writeFileSync(path.join(root,".modpack","cache.json"), JSON.stringify(cache))
+            fs.writeFileSync(path.join(root, ".modpack", "cache.json"), JSON.stringify(cache))
         }
     }
     if (promises.length > 0) {
         await Promise.allSettled(promises)
         fs.writeFileSync(path.join(root, 'modpack-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
-        fs.writeFileSync(path.join(root,".modpack","cache.json"), JSON.stringify(cache))
+        fs.writeFileSync(path.join(root, ".modpack", "cache.json"), JSON.stringify(cache))
     }
 }
 
@@ -61,7 +62,7 @@ async function download(mod, cfg, cache, force) {
     let file = {};
     const root = process.cwd();
     const mods = path.join(root, "mods");
-    if (mod.download_url) {
+    if (mod.downloadUrl) {
         file = mod;
     } else {
         if (mod.strategy === 'none')
@@ -108,7 +109,7 @@ async function download(mod, cfg, cache, force) {
         file = all_files[0]
         mod.new_version = file.displayName
     }
-
+    file.fileName = file.fileName||`${file.name}.jar`
     logger.info(`Downloading ${file.fileName}...`)
     const options = helpers.options(cfg)
     let files = fs.readdirSync(mods);
@@ -128,7 +129,8 @@ async function download(mod, cfg, cache, force) {
         override: true,
         retry: cfg.retry
     });
-    let new_version = file.displayName
+    let new_version = file.displayName||file.name
+
     if (new_version.endsWith('.jar'))
         new_version = new_version.substring(0, new_version.length - 4)
     return new Promise((resolve, reject) => {
@@ -137,7 +139,7 @@ async function download(mod, cfg, cache, force) {
             cache.date = file.fileDate
             mod.new_version = new_version
             cache.last_check = new Date()
-            mod.md5 = md5File.sync(path.join(mods,file.fileName))
+            mod.md5 = md5File.sync(path.join(mods, file.fileName))
             resolve()
         })
         dl.on('error', error => {
