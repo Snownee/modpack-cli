@@ -62,7 +62,7 @@ async function download(mod, cfg, cache, force) {
     let file = {};
     const root = process.cwd();
     const mods = path.join(root, "mods");
-    if (mod.downloadUrl) {
+    if (mod.downloadUrl && force) {
         file = mod;
     } else {
         if (mod.strategy === 'none')
@@ -109,7 +109,7 @@ async function download(mod, cfg, cache, force) {
         file = all_files[0]
         mod.new_version = file.displayName
     }
-    file.fileName = file.fileName||`${file.name}.jar`
+    file.fileName = file.fileName || `${file.name}.jar`
     logger.info(`Downloading ${file.fileName}...`)
     const options = helpers.options(cfg)
     let files = fs.readdirSync(mods);
@@ -129,7 +129,7 @@ async function download(mod, cfg, cache, force) {
         override: true,
         retry: cfg.retry
     });
-    let new_version = file.displayName||file.name
+    let new_version = file.displayName || file.name
 
     if (new_version.endsWith('.jar'))
         new_version = new_version.substring(0, new_version.length - 4)
