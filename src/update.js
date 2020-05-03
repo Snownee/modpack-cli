@@ -39,7 +39,7 @@ exports.default = async (mod_name, force) => {
             cache[`m${mod.addon_id}`] = {}
         if (!mod_name) {
             promises.push(download(mod, cfg, cache[`m${mod.addon_id}`], force))
-        } else if (new RegExp(mod_name).test(mod.name)) {
+        } else if (new RegExp(mod_name.toLowerCase()).test(mod.name.toLowerCase())) {
             let cfg_cpy = {...cfg};
             cfg_cpy.check_interval = 0;
             promises.push(download(mod, cfg_cpy, cache[`m${mod.addon_id}`], force))
@@ -62,8 +62,11 @@ async function download(mod, cfg, cache, force) {
     let file = {};
     const root = process.cwd();
     const mods = path.join(root, "mods");
-    if (mod.downloadUrl && force) {
-        file = mod;
+    if (mod.downloadUrl) {
+        if (force)
+            file = mod;
+        else
+            return ;
     } else {
         if (mod.strategy === 'none')
             return Promise.resolve()
