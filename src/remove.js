@@ -16,7 +16,7 @@ exports.default = async (mod_name) => {
     let mods_cfg = JSON.parse(fs.readFileSync(path.join(root, "modpack-mods.json")))
     let remove = [];
     for (let i of mods_cfg) {
-        if (new RegExp(mod_name).test(i.name)) {
+        if (new RegExp(mod_name.toLowerCase()).test(i.name.toLowerCase())) {
             let files = fs.readdirSync(mods);
             for (let file of files) {
                 let file_name = path.join(mods, file);
@@ -40,7 +40,6 @@ exports.default = async (mod_name) => {
                 }
             }
         }
-        console.log(remove)
         mods_cfg = mods_cfg.filter(i => remove.indexOf(i.addon_id) < 0);
         fs.writeFileSync(path.join(root, 'modpack-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
     }
