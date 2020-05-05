@@ -43,10 +43,10 @@ const path = require('path');
             await tasks.remove(mod_name);
         })
     commander
-        .command('list')
+        .command('list [ext]')
         .description('list all mods!')
-        .action(async (cmd) => {
-            await tasks.list();
+        .action(async (ext,cmd) => {
+            await tasks.list(ext);
         })
     commander
         .command('build [includes]')
