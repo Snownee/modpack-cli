@@ -52,10 +52,10 @@ exports.default = async (includes) => {
         let manifest = {
             minecraft: {
                 version: cfg.mcversion,
-                modLoaders: {
+                modLoaders:[{
                     id: `${cfg.modloader}-${version}`,
                     primary: true
-                }
+                }]
             },
             manifestType: "minecraftModpack",
             manifestVersion: 1,

@@ -115,6 +115,7 @@ async function download(mod, cfg, cache, force) {
         all_files = all_files.sort((i, j) => (new Date(i.fileDate).getTime() > new Date(j.fileDate).getTime() ? -1 : 1))
         file = all_files[0]
         mod.new_version = file.displayName
+        mod.file_id = file.id
     }
     file.fileName = file.fileName || `${file.name}.jar`
     logger.info(`Downloading ${file.fileName}...`)
