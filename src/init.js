@@ -53,8 +53,13 @@ exports.default = async () => {
     fs.writeFileSync(path.join(root, 'modpack_includes', 'default.json'), JSON.stringify(
     {
         files: [
-            "mods",
             "config",
+            "openloader",
+            "kubejs",
+            "patchouli_books",
+            "scripts",
+            "defaultconfigs",
+            "ma-essentials",
             "options.txt"
         ]
     }, '\n', 2))
