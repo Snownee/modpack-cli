@@ -34,5 +34,8 @@
     "rimraf": "^3.0.2",
     "simple-proxy-agent": "^1.0.7"
   },
-  "bin": "./bin/modpack.js"
+  "bin": "./bin/modpack.js",
+  "devDependencies": {
+    "@types/node": "^14.0.23"
+  }
 }
