@@ -33,7 +33,7 @@ exports.default = async (name) => {
         let mod =await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/${name}`, options(cfg))).json()
     }
     else {
-        mods_list = await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/search?sectionId=6&gameId=432&gameVersion=${cfg.mcversion}&searchFilter=${name}`, options(cfg))).json()
+        mods_list = await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/search?sectionId=6&gameId=432&searchFilter=${name.replace(' ','+')}&gameVersion=${cfg.mcversion}`, options(cfg))).json()
         if (mods_list.length === 0){
             logger.failure(`Cannot find any mod!`);
             process.exit();
