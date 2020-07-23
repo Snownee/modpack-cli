@@ -19,18 +19,21 @@ const path = require('path');
 
     commander
         .command('init')
+        .alias('i')
         .description('Init a new modpack environment in this folder!')
         .action(async (cmd) => {
             await tasks.init();
         })
     commander
         .command('add <name>')
+        .alias('a')
         .description('Add new mod to modpack!')
         .action(async (name, cmd) => {
             await tasks.add(name);
         })
     commander
         .command('update [mod_name]')
+        .alias('u')
         .description('Update added mods!')
         .option("-f, --force","disable check interval")
         .action(async (mod_name, cmd) => {
@@ -38,24 +41,28 @@ const path = require('path');
         })
     commander
         .command('remove [mod_name]')
+        .alias('r')
         .description('Remove mod!')
         .action(async (mod_name, cmd) => {
             await tasks.remove(mod_name);
         })
     commander
         .command('list [ext]')
+        .alias('l')
         .description('list all mods!')
         .action(async (ext,cmd) => {
             await tasks.list(ext);
         })
     commander
         .command('build [includes]')
+        .alias('b')
         .description('build this modpack!')
         .action(async (includes, cmd) => {
             await tasks.build(includes);
         })
     commander
         .command('publish [includes]')
+        .alias('p')
         .description('publish this modpack!')
         .action(async (includes, cmd) => {
             await tasks.publish(includes);
