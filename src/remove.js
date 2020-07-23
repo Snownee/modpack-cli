@@ -26,8 +26,8 @@ exports.default = async (mod_name) => {
                             {
                                 type: 'list',
                                 name: 'ok',
-                                message: chalk.red(`Do you want remove ${i.name}?`),
-                                choices: ["no", "yes"],
+                                message: chalk.red(`Are you sure to remove ${i.name}?`),
+                                choices: ["yes", "no"],
                                 default: 0
                             }
                         ])

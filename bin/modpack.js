@@ -40,7 +40,7 @@ const path = require('path');
             await tasks.update(mod_name,cmd.force);
         })
     commander
-        .command('remove [mod_name]')
+        .command('remove <name>')
         .alias('r')
         .description('Remove mod!')
         .action(async (mod_name, cmd) => {
