@@ -114,3 +114,4 @@ modpack_includes/
 modpack-mods.json
 modpack-project.json
 .modpack/
+test/

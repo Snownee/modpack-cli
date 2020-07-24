@@ -84,4 +84,27 @@ exports.default = async (ext) => {
 
         console.log("<ul>"+output.map(i=>`<li><a href="${i.url}">${i.Name}</a></li>`).join("  \n")+"</ul>");
     }
+    if (ext === 'bbc') {
+        let output = cfg.map(mod => {
+            return {
+                Name: mod.name,
+                url: mod.homepage || mod.downloadUrl || `https://www.curseforge.com/minecraft/mc-mods/${mod.slug}`
+            }
+        })
+        output.sort((a, b) => {
+            let nameA = a.Name.toUpperCase(); // ignore upper and lowercase
+            let nameB = b.Name.toUpperCase(); // ignore upper and lowercase
+            if (nameA < nameB) {
+                return -1;
+            }
+            if (nameA > nameB) {
+                return 1;
+            }
+
+            // names must be equal
+            return 0;
+        })
+
+        console.log("[list]"+output.map(i=>`[*][url=${i.url}]${i.Name}[/url]`).join("  \n")+"[/list]");
+    }
 }
