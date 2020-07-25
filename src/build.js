@@ -67,18 +67,17 @@ exports.default = async (includes) => {
         if (!includes_cfg.files.includes('mods')) {
             includes_cfg.files.push('mods')
             includes_cfg.files = includes_cfg.files.filter(i => fs.existsSync(i));
-            manifest.files = mods_cfg.map(i => i.downloadUrl ? undefined : {
+            manifest.files = mods_cfg.map(i => (i.downloadUrl || !i.file_id) ? undefined : {
                 projectID: i.addon_id,
                 fileID: i.file_id,
-                required: true,
-                md5: i.md5
+                required: true
             }).filter(i => i)
             logger.info(`Add ${manifest.files.length} mods to manifest!`)
             if (includes_cfg.files.length > 0) {
                 await cpy(includes_cfg.files, overrides, {
                     parents: true, filter: file => {
                         const md5 = md5File.sync(file.path);
-                        return manifest.files.filter(i => md5 === i.md5).length <= 0;
+                        return mods_cfg.filter(i => md5 === i.md5).length <= 0;
                     }
                 });
             }
