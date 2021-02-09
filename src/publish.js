@@ -34,9 +34,7 @@ exports.default = async (includes) => {
             additions.push(mod)
         } else if (mod.old_version !== mod.new_version) {
             updates.push(mod)
-            // updates += `${mod.old_version} -> ${mod.new_version}\n`
         }
-        mod.old_version = mod.new_version
     }
     let log = `# ${cfg.name} ${ver}\n`
     if (additions.length > 0) {
@@ -48,6 +46,9 @@ exports.default = async (includes) => {
         log += '\n## Updated\n\n'
         for (let mod of updates)
             log += ` - [${mod.name}](https://www.curseforge.com/minecraft/mc-mods/${mod.slug}) - ${mod.old_version} -> ${mod.new_version}\n`
+    }
+    for (let mod of mods_cfg) {
+        mod.old_version = mod.new_version
     }
     fs.writeFileSync(path.join(root, 'build', `${cfg.name}-${ver}.md`), log)
     fs.writeFileSync(path.join(root, 'modpack-mods.json'), JSON.stringify(mods_cfg, '\n', 2))
