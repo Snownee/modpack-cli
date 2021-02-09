@@ -28,8 +28,9 @@ const path = require('path');
         .command('add <name>')
         .alias('a')
         .description('Add new mod to modpack!')
+        .option("-f, --force","force searching all versions")
         .action(async (name, cmd) => {
-            await tasks.add(name);
+            await tasks.add(name,cmd.force);
         })
     commander
         .command('update [mod_name]')

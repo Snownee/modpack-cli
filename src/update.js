@@ -93,7 +93,18 @@ async function download(mod, cfg, cache, force) {
             if (!force && new Date(f.fileDate) <= new Date(cache.date))
                 return false
             if (!f.gameVersion.includes(cfg.mcversion))
-                return false
+                if (!cfg.compatible_versions || cfg.compatible_versions === '')
+                  return false
+                let re = new RegExp(cfg.compatible_versions)
+                let success = false;
+                for (let v of f.gameVersion) {
+                  if (re.test(v)) {
+                    success = true
+                    break
+                  }
+                }
+                if (!success)
+                  return false
             if (cfg.modloader === 'forge') {
                 if (f.fileName.toLowerCase().includes('fabric'))
                     return false
@@ -126,7 +137,7 @@ async function download(mod, cfg, cache, force) {
         if (fs.statSync(file_name).isFile()) {
             if (md5File.sync(file_name) === mod.md5) {
                 fs.unlinkSync(file_name);
-                logger.info(`delete old file ${i}`);
+                logger.info(`Delete outdated file ${i}`);
             }
         }
     }
@@ -143,7 +154,7 @@ async function download(mod, cfg, cache, force) {
         new_version = new_version.substring(0, new_version.length - 4)
     return new Promise((resolve, reject) => {
         dl.on('end', () => {
-            logger.success(`Download ${file.fileName} successfully!`);
+            logger.success(`Download ${file.fileName} OK`);
             cache.date = file.fileDate
             mod.new_version = new_version
             cache.last_check = new Date()

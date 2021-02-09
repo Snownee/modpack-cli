@@ -8,7 +8,7 @@ const { DownloaderHelper } = require('node-downloader-helper');
 const { byteHelper, inlineLog, options } = require('./helpers');
 const logger = require('./logger');
 
-exports.default = async (name) => {
+exports.default = async (name, all_versions) => {
     const root = process.cwd();
     logger.info(`Add mod ${name} in ${root}`);
     const mods = path.join(root,"mods");
@@ -33,7 +33,10 @@ exports.default = async (name) => {
         let mod =await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/${name}`, options(cfg))).json()
     }
     else {
-        mods_list = await (await fetch(`https://addons-ecs.forgesvc.net/api/v2/addon/search?sectionId=6&gameId=432&searchFilter=${name.replace(' ','+')}&gameVersion=${cfg.mcversion}`, options(cfg))).json()
+        let url = `https://addons-ecs.forgesvc.net/api/v2/addon/search?sectionId=6&gameId=432&searchFilter=${name.replace(' ','+')}`
+        if (!all_versions)
+          url += `&gameVersion=${cfg.mcversion}`
+        mods_list = await (await fetch(url, options(cfg))).json()
         if (mods_list.length === 0){
             logger.failure(`Cannot find any mod!`);
             process.exit();

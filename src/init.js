@@ -14,13 +14,19 @@ exports.default = async () => {
             type: 'input',
             name: 'name',
             message: chalk.red('Modpack name?'),
-            default: "new modpack"
+            default: "My Modpack"
         },
         {
             type: 'input',
             name: 'mcversion',
             message: chalk.red('Minecraft version?'),
             default: "1.12.2"
+        },
+        {
+            type: 'input',
+            name: 'compatible_versions',
+            message: chalk.red('Compatible versions reg exp?'),
+            default: ""
         },
         {
             type: 'input',
